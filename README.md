@@ -1,2 +1,2 @@
 # PATE
-Aarons Terminal Emulator in Pascal
+**A**arons **T**erminal **E**mulator in **P**ascal
