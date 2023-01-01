@@ -44,9 +44,15 @@ begin
                 loop := false;
                 WriteLn('Bye :)');
             end
+        else if (command = 'echo') then
+            begin
+                if (Length(Args) = 0) then
+                    WriteLn('ERROR: Insufficient arguments')
+                else
+                    WriteLn(JoinArrayWithDelim(Args, ' '));
+            end
         else
             begin
-                WriteLn(Args[0]);
                 TextColor(Red);
                 WriteLn('ERROR: Unknown command `' + Command + '`');
                 TextColor(White);
