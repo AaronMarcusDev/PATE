@@ -1,6 +1,9 @@
 program PATE;
 
-uses crt, sysutils, strutils, arraytools;
+// Units
+uses crt, sysutils, strutils, process, 
+// Custom units
+arraytools;
 
 const
     Version: string = 'beta';
@@ -10,6 +13,7 @@ var
     Tokens: TStringArray;
     Command: string;
     Args: TStringArray;
+    ProcessResult: ansistring;
 
 begin
 // Initialize variables
@@ -40,9 +44,46 @@ begin
         if (Length(command) = 0) then
             continue
         else if (command = 'exit') then
+            loop := false
+        else if (command = 'exitclr') then
             begin
                 loop := false;
-                WriteLn('Bye :)');
+                ClrScr;
+            end
+        else if (command = 'sys') then
+            begin
+                if (Length(Args) = 0) then
+                    begin
+                        WriteLn('ERROR: Insufficient arguments');
+                    end
+                else if (Length(Args) = 1) then
+                    begin
+                        if (RunCommand(Args[0], [], ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            WriteLn('ERROR: System command failed');
+                    end
+                else
+                    begin
+                        if (RunCommand(Args[0], Copy(Args, 1, Length(Args)), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            WriteLn('ERROR: System command failed');
+                    end;
+            end
+        else if (command = 'syscmd') then
+            begin
+                if (Length(Args) = 0) then
+                    begin
+                        WriteLn('ERROR: Insufficient arguments');
+                    end
+                else
+                    begin
+                        if (RunCommand('cmd.exe', ConcatArrays(['/c'], Args), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            WriteLn('ERROR: System command failed');
+                    end;
             end
         else if (command = 'echo') then
             begin
@@ -51,6 +92,8 @@ begin
                 else
                     WriteLn(JoinArrayWithDelim(Args, ' '));
             end
+        else if (command = 'clr') then
+            ClrScr
         else
             begin
                 TextColor(Red);
