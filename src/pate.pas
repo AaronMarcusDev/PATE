@@ -14,6 +14,7 @@ var
     Command: string;
     Args: TStringArray;
     ProcessResult: ansistring;
+    F: THandle;
 
 begin
 // Initialize variables
@@ -117,10 +118,23 @@ begin
                             WriteLn('ERROR: File `' + Args[0] + '` already exists')
                         else
                             begin
-                                if (FileCreate(Args[0]) <> feInvalidHandle) then {}
-                                else
-                                    WriteLn('ERROR: Failed to create file `' + Args[0] + '`');
-                            end;
+                                F := FileCreate(Args[0]);
+                                FileClose(F);
+                            end
+                    end
+            end
+        else if (command = 'del') then
+            begin
+                if (Length(Args) = 0) then
+                    WriteLn('ERROR: Insufficient arguments')
+                else if (Length(Args) > 1) then
+                    WriteLn('ERROR: Too many arguments')
+                else
+                    begin
+                        if (FileExists(Args[0])) then
+                            DeleteFile(Args[0])
+                        else
+                            WriteLn('ERROR: File `' + Args[0] + '` does not exist');
                     end
             end
         else if (command = 'rm') then
