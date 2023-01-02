@@ -1,9 +1,9 @@
 program PATE;
 
 // Units
-uses crt, sysutils, strutils, process, 
+uses crt, sysutils, strutils, process,
 // Custom units
-arraytools;
+arraytools, error;
 
 const
     Version: string = 'beta';
@@ -39,7 +39,7 @@ begin
         begin
             Tokens := Trim(LowerCase(Command)).Split(' ');
             Command := Tokens[0];
-            Args := Copy(Tokens, 1, Length(Tokens))
+            Args := Copy(Tokens, 1, Length(Tokens));
         end;
 
         if (Length(command) = 0) then
@@ -55,41 +55,41 @@ begin
             begin
                 if (Length(Args) = 0) then
                     begin
-                        WriteLn('ERROR: Insufficient arguments');
+                        WriteLn('Insufficient arguments');
                     end
                 else if (Length(Args) = 1) then
                     begin
                         if (RunCommand(Args[0], [], ProcessResult)) then
                             WriteLn(ProcessResult)
                         else
-                            WriteLn('ERROR: System command failed');
+                            WriteLn('System command failed');
                     end
                 else
                     begin
                         if (RunCommand(Args[0], Copy(Args, 1, Length(Args)), ProcessResult)) then
                             WriteLn(ProcessResult)
                         else
-                            WriteLn('ERROR: System command failed');
+                            WriteLn('System command failed');
                     end;
             end
         else if (command = 'syscmd') then
             begin
                 if (Length(Args) = 0) then
                     begin
-                        WriteLn('ERROR: Insufficient arguments');
+                        Report('Insufficient arguments');
                     end
                 else
                     begin
                         if (RunCommand('cmd.exe', ConcatArrays(['/c'], Args), ProcessResult)) then
                             WriteLn(ProcessResult)
                         else
-                            WriteLn('ERROR: System command failed');
+                            Report('System command failed');
                     end;
             end
         else if (command = 'echo') then
             begin
                 if (Length(Args) = 0) then
-                    WriteLn('ERROR: Insufficient arguments')
+                    Report('Insufficient arguments')
                 else
                     WriteLn(JoinArrayWithDelim(Args, ' '));
             end
@@ -100,22 +100,22 @@ begin
         else if (command = 'cd') then
             begin
                 if (Length(Args) = 0) then
-                    WriteLn('ERROR: Insufficient arguments')
+                    Report('Insufficient arguments')
                 else
                     begin
                         if (SetCurrentDir(Args[0])) then {}
                         else
-                            WriteLn('ERROR: Failed to change directory to `' + Args[0] + '`');
+                            Report('Failed to change directory to `' + Args[0] + '`');
                     end;
             end
         else if (command = 'touch') then
             begin
                 if (Length(Args) = 0) then
-                    WriteLn('ERROR: Insufficient arguments')
+                    Report('Insufficient arguments')
                 else
                     begin
                         if (FileExists(Args[0])) then
-                            WriteLn('ERROR: File `' + Args[0] + '` already exists')
+                            Report('File `' + Args[0] + '` already exists')
                         else
                             begin
                                 F := FileCreate(Args[0]);
@@ -126,32 +126,44 @@ begin
         else if (command = 'del') then
             begin
                 if (Length(Args) = 0) then
-                    WriteLn('ERROR: Insufficient arguments')
+                    Report('Insufficient arguments')
                 else if (Length(Args) > 1) then
-                    WriteLn('ERROR: Too many arguments')
+                    Report('Too many arguments')
                 else
                     begin
                         if (FileExists(Args[0])) then
                             DeleteFile(Args[0])
                         else
-                            WriteLn('ERROR: File `' + Args[0] + '` does not exist');
+                            Report('File `' + Args[0] + '` does not exist');
                     end
             end
-        else if (command = 'rm') then
+        else if (command = 'mkdir') then
             begin
                 if (Length(Args) = 0) then
-                    WriteLn('ERROR: Insufficient arguments')
+                    report('Insufficient arguments')
+                else if (Length(Args) > 1) then
+                    report('Too many arguments')
                 else
                     begin
-                        if (FileExists(Args[0])) then
-                            begin
-                                if (DeleteFile(Args[0])) then {}
-                                else
-                                    WriteLn('ERROR: Failed to delete file `' + Args[0] + '`');
-                            end
+                        if (DirectoryExists(Args[0])) then
+                            report('Directory `' + Args[0] + '` already exists')
                         else
-                            WriteLn('ERROR: File `' + Args[0] + '` does not exist');
+                            MkDir(Args[0]);
                     end;
+            end
+        else if (command = 'deldir') then
+            begin
+                if (Length(Args) = 0) then
+                    Report('Insufficient arguments')
+                else if (Length(Args) > 1) then
+                    Report('Too many arguments')
+                else
+                    begin
+                        if (DirectoryExists(Args[0])) then
+                            RmDir(Args[0])
+                        else
+                            Report('Directory `' + Args[0] + '` does not exist');
+                    end
             end
         else if (command = 'help') then
             begin
@@ -172,7 +184,7 @@ begin
         else
             begin
                 TextColor(Red);
-                WriteLn('ERROR: Unknown command `' + Command + '`');
+                Report('Unknown command `' + Command + '`');
                 TextColor(White);
             end;
     end;
