@@ -17,8 +17,13 @@ var
     F: THandle;
 
 begin
-// Initialize variables
-    User := 'user';
+// Initialize variable values
+    {$IFDEF WINDOWS}
+        User := GetEnvironmentVariable('USERNAME');
+    {$ELSE}
+        User := GetEnvironmentVariable('USER');
+    {$ENDIF}
+    
     Loop := true;
     Args := [];
 
@@ -167,19 +172,24 @@ begin
             end
         else if (command = 'help') then
             begin
-                WriteLn('PATE version ' + Version);
-                WriteLn('Available commands:');
+                TextColor(Blue);
+                WriteLn('PATE version' + Version);
+                TextColor(White);
+                WriteLn('PATE is a terminal emulator written in Pascal');
+                WriteLn('Commands:');
                 WriteLn('  exit - Exit PATE');
                 WriteLn('  exitclr - Exit PATE and clear the screen');
                 WriteLn('  sys - Run a system command');
-                WriteLn('  syscmd - Run a system command in a new cmd.exe instance');
+                WriteLn('  syscmd - Run a system command in cmd.exe');
                 WriteLn('  echo - Echo arguments');
                 WriteLn('  clr - Clear the screen');
-                WriteLn('  pwd - Print the current working directory');
-                WriteLn('  cd - Change the current working directory');
-                WriteLn('  touch - Create a new file');
-                WriteLn('  rm - Delete a file');
-                WriteLn('  help - Print this help message');
+                WriteLn('  pwd - Print working directory');
+                WriteLn('  cd - Change directory');
+                WriteLn('  touch - Create a file');
+                WriteLn('  del - Delete a file');
+                WriteLn('  mkdir - Create a directory');
+                WriteLn('  deldir - Delete a directory');
+                WriteLn('  help - Show this help message');
             end
         else
             begin
