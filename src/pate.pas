@@ -94,6 +94,67 @@ begin
             end
         else if (command = 'clr') then
             ClrScr
+        else if (command = 'pwd') then
+            WriteLn(GetCurrentDir)
+        else if (command = 'cd') then
+            begin
+                if (Length(Args) = 0) then
+                    WriteLn('ERROR: Insufficient arguments')
+                else
+                    begin
+                        if (SetCurrentDir(Args[0])) then {}
+                        else
+                            WriteLn('ERROR: Failed to change directory to `' + Args[0] + '`');
+                    end;
+            end
+        else if (command = 'touch') then
+            begin
+                if (Length(Args) = 0) then
+                    WriteLn('ERROR: Insufficient arguments')
+                else
+                    begin
+                        if (FileExists(Args[0])) then
+                            WriteLn('ERROR: File `' + Args[0] + '` already exists')
+                        else
+                            begin
+                                if (FileCreate(Args[0]) <> feInvalidHandle) then {}
+                                else
+                                    WriteLn('ERROR: Failed to create file `' + Args[0] + '`');
+                            end;
+                    end
+            end
+        else if (command = 'rm') then
+            begin
+                if (Length(Args) = 0) then
+                    WriteLn('ERROR: Insufficient arguments')
+                else
+                    begin
+                        if (FileExists(Args[0])) then
+                            begin
+                                if (DeleteFile(Args[0])) then {}
+                                else
+                                    WriteLn('ERROR: Failed to delete file `' + Args[0] + '`');
+                            end
+                        else
+                            WriteLn('ERROR: File `' + Args[0] + '` does not exist');
+                    end;
+            end
+        else if (command = 'help') then
+            begin
+                WriteLn('PATE version ' + Version);
+                WriteLn('Available commands:');
+                WriteLn('  exit - Exit PATE');
+                WriteLn('  exitclr - Exit PATE and clear the screen');
+                WriteLn('  sys - Run a system command');
+                WriteLn('  syscmd - Run a system command in a new cmd.exe instance');
+                WriteLn('  echo - Echo arguments');
+                WriteLn('  clr - Clear the screen');
+                WriteLn('  pwd - Print the current working directory');
+                WriteLn('  cd - Change the current working directory');
+                WriteLn('  touch - Create a new file');
+                WriteLn('  rm - Delete a file');
+                WriteLn('  help - Print this help message');
+            end
         else
             begin
                 TextColor(Red);
