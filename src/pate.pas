@@ -23,13 +23,13 @@ begin
     {$ELSE}
         User := GetEnvironmentVariable('USER');
     {$ENDIF}
-    
+
     Loop := true;
     Args := [];
 
 // Start
     ClrScr;
-    while loop do
+    while Loop do
     begin
         TextColor(Blue);
         Write(User);
@@ -39,24 +39,24 @@ begin
         Write(GetCurrentDir + sLineBreak + '$ ');
         TextColor(White);
         
-        readLn(Command);
-        if (pos(' ' , Command) <> 0) then
+        ReadLn(Command);
+        if (Pos(' ' , Command) <> 0) then
         begin
-            Tokens := Trim(LowerCase(Command)).Split(' ');
+            Tokens := Trim(Command).Split(' ');
             Command := Tokens[0];
             Args := Copy(Tokens, 1, Length(Tokens));
         end;
 
-        if (Length(command) = 0) then
+        if (Length(Command) = 0) then
             continue
-        else if (command = 'exit') then
-            loop := false
-        else if (command = 'exitclr') then
+        else if (Command = 'exit') then
+            Loop := false
+        else if (Command = 'exitclr') then
             begin
-                loop := false;
+                Loop := false;
                 ClrScr;
             end
-        else if (command = 'sys') then
+        else if (Command = 'sys') then
             begin
                 if (Length(Args) = 0) then
                     begin
@@ -77,7 +77,7 @@ begin
                             WriteLn('System command failed');
                     end;
             end
-        else if (command = 'syscmd') then
+        else if (Command = 'syscmd') then
             begin
                 if (Length(Args) = 0) then
                     begin
@@ -89,20 +89,20 @@ begin
                             WriteLn(ProcessResult)
                         else
                             Report('System command failed');
-                    end;
+                    end
             end
-        else if (command = 'echo') then
+        else if (Command = 'echo') then
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
                 else
                     WriteLn(JoinArrayWithDelim(Args, ' '));
             end
-        else if (command = 'clr') then
+        else if (Command = 'clr') then
             ClrScr
-        else if (command = 'pwd') then
+        else if (Command = 'pwd') then
             WriteLn(GetCurrentDir)
-        else if (command = 'cd') then
+        else if (Command = 'cd') then
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
@@ -111,9 +111,9 @@ begin
                         if (SetCurrentDir(Args[0])) then {}
                         else
                             Report('Failed to change directory to `' + Args[0] + '`');
-                    end;
+                    end
             end
-        else if (command = 'touch') then
+        else if (Command = 'touch') then
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
@@ -128,7 +128,7 @@ begin
                             end
                     end
             end
-        else if (command = 'del') then
+        else if (Command = 'del') then
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
@@ -142,21 +142,21 @@ begin
                             Report('File `' + Args[0] + '` does not exist');
                     end
             end
-        else if (command = 'mkdir') then
+        else if (Command = 'mkdir') then
             begin
                 if (Length(Args) = 0) then
-                    report('Insufficient arguments')
+                    Report('Insufficient arguments')
                 else if (Length(Args) > 1) then
-                    report('Too many arguments')
+                    Report('Too many arguments')
                 else
                     begin
                         if (DirectoryExists(Args[0])) then
-                            report('Directory `' + Args[0] + '` already exists')
+                            Report('Directory `' + Args[0] + '` already exists')
                         else
                             MkDir(Args[0]);
                     end;
             end
-        else if (command = 'deldir') then
+        else if (Command = 'deldir') then
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
@@ -170,7 +170,7 @@ begin
                             Report('Directory `' + Args[0] + '` does not exist');
                     end
             end
-        else if (command = 'help') then
+        else if (Command = 'help') then
             begin
                 TextColor(Blue);
                 WriteLn('PATE version' + Version);
@@ -197,5 +197,5 @@ begin
                 Report('Unknown command `' + Command + '`');
                 TextColor(White);
             end;
-    end;
+    end
 end.
