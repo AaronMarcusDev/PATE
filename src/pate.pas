@@ -9,6 +9,7 @@ const
     Version: string = 'beta';
 var
     User: string;
+    Platform: string;
     Loop: boolean;
     Tokens: TStringArray;
     Command: string;
@@ -20,8 +21,10 @@ begin
 // Initialize variable values
     {$IFDEF WINDOWS}
         User := GetEnvironmentVariable('USERNAME');
+        Platform := 'windows';
     {$ELSE}
         User := GetEnvironmentVariable('USER');
+        Platform := 'linux';
     {$ENDIF}
 
     Loop := true;
@@ -38,14 +41,14 @@ begin
         TextColor(Green);
         Write(GetCurrentDir + sLineBreak + '$ ');
         TextColor(White);
-        
+
         ReadLn(Command);
         if (Pos(' ' , Command) <> 0) then
-        begin
-            Tokens := Trim(Command).Split(' ');
-            Command := Tokens[0];
-            Args := Copy(Tokens, 1, Length(Tokens));
-        end;
+            begin
+                Tokens := Trim(Command).Split(' ');
+                Command := Tokens[0];
+                Args := Copy(Tokens, 1, Length(Tokens));
+            end;
 
         if (Length(Command) = 0) then
             continue
@@ -55,41 +58,6 @@ begin
             begin
                 Loop := false;
                 ClrScr;
-            end
-        else if (Command = 'sys') then
-            begin
-                if (Length(Args) = 0) then
-                    begin
-                        WriteLn('Insufficient arguments');
-                    end
-                else if (Length(Args) = 1) then
-                    begin
-                        if (RunCommand(Args[0], [], ProcessResult)) then
-                            WriteLn(ProcessResult)
-                        else
-                            WriteLn('System command failed');
-                    end
-                else
-                    begin
-                        if (RunCommand(Args[0], Copy(Args, 1, Length(Args)), ProcessResult)) then
-                            WriteLn(ProcessResult)
-                        else
-                            WriteLn('System command failed');
-                    end;
-            end
-        else if (Command = 'syscmd') then
-            begin
-                if (Length(Args) = 0) then
-                    begin
-                        Report('Insufficient arguments');
-                    end
-                else
-                    begin
-                        if (RunCommand('cmd.exe', ConcatArrays(['/c'], Args), ProcessResult)) then
-                            WriteLn(ProcessResult)
-                        else
-                            Report('System command failed');
-                    end
             end
         else if (Command = 'echo') then
             begin
@@ -106,6 +74,8 @@ begin
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
+                else if (Length(Args) > 1) then
+                    Report('Too many arguments')
                 else
                     begin
                         if (SetCurrentDir(Args[0])) then {}
@@ -117,6 +87,8 @@ begin
             begin
                 if (Length(Args) = 0) then
                     Report('Insufficient arguments')
+                else if (Length(Args) > 1) then
+                    Report('Too many arguments')
                 else
                     begin
                         if (FileExists(Args[0])) then
@@ -193,9 +165,20 @@ begin
             end
         else
             begin
-                TextColor(Red);
-                Report('Unknown command `' + Command + '`');
-                TextColor(White);
+                if (Platform = 'windows') then
+                    begin
+                        if (RunCommand('cmd.exe', ConcatArrays(['/c', Command], Args), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            Report('Invalid command');
+                    end
+                else
+                    begin
+                        if (RunCommand(Args[0], Copy(Args, 1, Length(Args)), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            Report('Invalid command');
+                    end;
             end;
-    end
+    end;
 end.
