@@ -16,6 +16,8 @@ var
     Args: TStringArray;
     ProcessResult: ansistring;
     F: THandle;
+    sr: TSearchRec;
+    res: Integer;
 
 begin
 // Initialize variable values
@@ -141,6 +143,43 @@ begin
                         else
                             Report('Directory `' + Args[0] + '` does not exist');
                     end
+            end
+        else if (Command = 'ls') then
+            begin
+                res := FindFirst('*', faAnyFile, sr);
+                while res = 0 do
+                    begin
+                        if (sr.Attr and faDirectory) = faDirectory then
+                            writeln('<DIR>  ', sr.Name)
+                        else
+                            writeln('<FILE> ', sr.Name);
+                        res := FindNext(sr);
+                    end;
+                FindClose(sr);
+            end
+        else if (Command = 'sys') then
+            begin
+                if (Length(Args) = 0) then
+                    Report('Insufficient arguments')
+                else
+                    begin
+                        if (RunCommand(Args[0], Copy(Args, 1, Length(Args)), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            Report('Invalid command');
+                    end;
+            end
+        else if (Command = 'syscmd') then
+            begin
+                if (Length(Args) = 0) then
+                    Report('Insufficient arguments')
+                else
+                    begin
+                        if (RunCommand('cmd.exe', ConcatArrays(['/c', Command], Args), ProcessResult)) then
+                            WriteLn(ProcessResult)
+                        else
+                            Report('Invalid command');
+                    end;
             end
         else if (Command = 'help') then
             begin
